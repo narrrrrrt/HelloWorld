@@ -67,3 +67,6 @@ export default {
     return env.ASSETS.fetch(req);
   },
 };
+
+
+export { CounterDO } from "./CounterDO";
