@@ -5,17 +5,16 @@ compatibility_date = "2025-09-05"
 [assets]
 directory = "./public"
 
-# Durable Object のバインディング
 [[durable_objects.bindings]]
 name = "CounterDO"
 class_name = "CounterDO"
 
-# マイグレーション: まず削除（存在しなくてもエラーにならない）
+# まず古い DO を削除
 [[migrations]]
 tag = "v-clean"
-delete_classes = ["CounterDO"]
+delete_class = "CounterDO"
 
-# マイグレーション: 新規作成（必ずクリーンから始められる）
+# 新規作成
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["CounterDO"]
