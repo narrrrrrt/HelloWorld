@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <title>SSE Timestamp</title>
+  <meta charset="UTF-8">
+  <title>Index</title>
 </head>
 <body>
-  <h1>SSE Timestamp Demo</h1>
-  <p>現在時刻 (SSE): <span id="time">接続中...</span></p>
+  <h1>来場者カウンター + タイマー</h1>
+  <p>現在時刻: <span id="time">...</span></p>
+  <p>カウンター: <span id="count">0</span></p>
+  <p><a href="/room.html">Roomへ</a></p>
 
   <script>
     const evtSource = new EventSource("/events");
-    evtSource.onmessage = (event) => {
-      document.getElementById("time").textContent = event.data;
-    };
-    evtSource.onerror = (err) => {
-      console.error("SSE error:", err);
+    evtSource.onmessage = (e) => {
+      const data = JSON.parse(e.data);
+      document.getElementById("time").textContent = data.timestamp;
+      document.getElementById("count").textContent = data.count;
     };
   </script>
 </body>
