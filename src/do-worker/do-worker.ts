@@ -31,7 +31,11 @@ export class CounterDO {
 
       // 初期値を必ず送る
       let count = (await this.storage.get("count")) || 0;
-      writer.write(`data: ${JSON.stringify({ count })}\n\n`);
+      writer.write(`data: ${JSON.stringify({ count })}
+
+`); // ← 修正: \n\n → 
+
+
 
       // 切断時にクリーンアップ
       request.signal.addEventListener("abort", () => {
@@ -52,7 +56,9 @@ export class CounterDO {
   }
 
   broadcast(count: number) {
-    const msg = `data: ${JSON.stringify({ count })}\n\n`;
+    const msg = `data: ${JSON.stringify({ count })}
+
+`; // ← 修正済み
     for (const writer of this.listeners) {
       writer.write(msg).catch(() => {
         this.listeners.delete(writer);

@@ -1,4 +1,4 @@
-name = "hello-counter-sse-simple"
+name = "hello-counter-sse-fixed"
 main = "src/index.ts"
 compatibility_date = "2025-09-05"
 
