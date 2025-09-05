@@ -1,23 +1,19 @@
 export default {
-  async fetch(request: Request): Promise<Response> {
-    const url = new URL(request.url);
+  async fetch(req: Request): Promise<Response> {
+    const url = new URL(req.url);
 
     if (url.pathname === "/events") {
       const stream = new ReadableStream({
         start(controller) {
-          const encoder = new TextEncoder();
-
-          // 最初のイベント
-          controller.enqueue(encoder.encode(`data: 初期メッセージ\n\n`));
-
-          // 5秒ごとに現在時刻を送信
-          const interval = setInterval(() => {
+          function send() {
+            const now = new Date().toISOString();
             controller.enqueue(
-              encoder.encode(`data: ${new Date().toISOString()}\n\n`)
+              new TextEncoder().encode(`data: ${now}\n\n`)
             );
-          }, 5000);
-
-          controller.closed.then(() => clearInterval(interval));
+          }
+          send();
+          const interval = setInterval(send, 1000);
+          controller.close = () => clearInterval(interval);
         },
       });
 
@@ -30,23 +26,6 @@ export default {
       });
     }
 
-    // 通常のリクエストはテスト用ページを返す
-    return new Response(
-      `<!DOCTYPE html>
-<html>
-  <body>
-    <h1>SSE Test</h1>
-    <div id="log"></div>
-    <script>
-      const es = new EventSource("/events");
-      es.onmessage = (e) => {
-        const div = document.getElementById("log");
-        div.innerHTML += "<p>" + e.data + "</p>";
-      };
-    </script>
-  </body>
-</html>`,
-      { headers: { "Content-Type": "text/html" } }
-    );
+    return new Response("Hello from SSE-only worker!");
   },
 };

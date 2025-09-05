@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>SSE Only</title>
+</head>
+<body>
+  <h1>SSE Only</h1>
+  <div id="time">...</div>
+  <script>
+    const eventSource = new EventSource("/events");
+    eventSource.onmessage = (e) => {
+      document.getElementById("time").textContent = e.data;
+    };
+  </script>
+</body>
+</html>
