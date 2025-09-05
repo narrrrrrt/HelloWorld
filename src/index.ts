@@ -1,49 +1,21 @@
-export class CounterDO {
-  state: DurableObjectState;
-  constructor(state: DurableObjectState) {
-    this.state = state;
-  }
-
-  async fetch(request: Request): Promise<Response> {
-    const url = new URL(request.url);
-
-    if (url.pathname === "/countup") {
-      let n = (await this.state.storage.get<number>("count")) || 0;
-      n++;
-      await this.state.storage.put("count", n);
-      return new Response(JSON.stringify({ count: n }), {
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    if (url.pathname === "/getcount") {
-      let n = (await this.state.storage.get<number>("count")) || 0;
-      return new Response(JSON.stringify({ count: n }), {
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    return new Response("Not found", { status: 404 });
-  }
-}
-
 export default {
-  async fetch(request: Request, env: any): Promise<Response> {
+  async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
 
     if (url.pathname === "/events") {
       const stream = new ReadableStream({
         start(controller) {
           const encoder = new TextEncoder();
-          controller.enqueue(encoder.encode(`data: 初期値 ${Date.now()}
 
-`));
+          // 最初のイベント
+          controller.enqueue(encoder.encode(`data: 初期メッセージ\n\n`));
 
+          // 5秒ごとに現在時刻を送信
           const interval = setInterval(() => {
-            controller.enqueue(encoder.encode(`data: ${new Date().toISOString()}
-
-`));
-          }, 1000);
+            controller.enqueue(
+              encoder.encode(`data: ${new Date().toISOString()}\n\n`)
+            );
+          }, 5000);
 
           controller.closed.then(() => clearInterval(interval));
         },
@@ -58,13 +30,23 @@ export default {
       });
     }
 
-    if (url.pathname.startsWith("/countup") || url.pathname.startsWith("/getcount")) {
-      const id = env.CounterDO.idFromName("A");
-      const stub = env.CounterDO.get(id);
-      return stub.fetch(request);
-    }
-
-    // 静的ファイル返す
-    return env.ASSETS.fetch(request);
+    // 通常のリクエストはテスト用ページを返す
+    return new Response(
+      `<!DOCTYPE html>
+<html>
+  <body>
+    <h1>SSE Test</h1>
+    <div id="log"></div>
+    <script>
+      const es = new EventSource("/events");
+      es.onmessage = (e) => {
+        const div = document.getElementById("log");
+        div.innerHTML += "<p>" + e.data + "</p>";
+      };
+    </script>
+  </body>
+</html>`,
+      { headers: { "Content-Type": "text/html" } }
+    );
   },
 };
