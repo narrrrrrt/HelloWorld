@@ -1,11 +1,14 @@
-name = "ive"
-main = "src/index.js"
-compatibility_date = "2025-09-04"
+name = "hello-counter-do"
+main = "src/index.ts"
+compatibility_date = "2025-09-05"
+
+[assets]
+directory = "./public"
 
 [[durable_objects.bindings]]
-name = "COUNTER"
-class_name = "Counter"
+name = "CounterDO"
+class_name = "CounterDO"
 
 [[migrations]]
 tag = "v1"
-new_sqlite_classes = ["Counter"]
+new_sqlite_classes = ["CounterDO"]
