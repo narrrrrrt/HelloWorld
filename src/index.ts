@@ -1,48 +1,70 @@
-export default {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+export class CounterDO {
+  state: DurableObjectState;
+  constructor(state: DurableObjectState) {
+    this.state = state;
+  }
+
+  async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
 
-    // 1. SSE のイベントストリーム
+    if (url.pathname === "/countup") {
+      let n = (await this.state.storage.get<number>("count")) || 0;
+      n++;
+      await this.state.storage.put("count", n);
+      return new Response(JSON.stringify({ count: n }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    if (url.pathname === "/getcount") {
+      let n = (await this.state.storage.get<number>("count")) || 0;
+      return new Response(JSON.stringify({ count: n }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response("Not found", { status: 404 });
+  }
+}
+
+export default {
+  async fetch(request: Request, env: any): Promise<Response> {
+    const url = new URL(request.url);
+
     if (url.pathname === "/events") {
-      const { readable, writable } = new TransformStream();
-      const writer = writable.getWriter();
+      const stream = new ReadableStream({
+        start(controller) {
+          const encoder = new TextEncoder();
+          controller.enqueue(encoder.encode(`data: 初期値 ${Date.now()}
 
-      function send(msg: any) {
-        writer.write(`data: ${JSON.stringify(msg)}\n\n`);
-      }
+`));
 
-      // 初回送信
-      send({ time: new Date().toISOString() });
+          const interval = setInterval(() => {
+            controller.enqueue(encoder.encode(`data: ${new Date().toISOString()}
 
-      const interval = setInterval(() => {
-        send({ time: new Date().toISOString() });
-      }, 5000);
+`));
+          }, 1000);
 
-      request.signal.addEventListener("abort", () => {
-        clearInterval(interval);
-        writer.close();
+          controller.closed.then(() => clearInterval(interval));
+        },
       });
 
-      return new Response(readable, {
+      return new Response(stream, {
         headers: {
-          "Content-Type": "text/event-stream; charset=utf-8",
-          "Cache-Control": "no-cache, no-transform",
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
           "Connection": "keep-alive",
         },
       });
     }
 
-    // 2. カウンターアップ → DO に投げる
-    if (url.pathname === "/countup") {
-      const id = env.CounterDO.idFromName("global");
+    if (url.pathname.startsWith("/countup") || url.pathname.startsWith("/getcount")) {
+      const id = env.CounterDO.idFromName("A");
       const stub = env.CounterDO.get(id);
-      return stub.fetch("https://do/countup", { method: "POST" });
+      return stub.fetch(request);
     }
 
-    // 3. それ以外は静的アセットへ
+    // 静的ファイル返す
     return env.ASSETS.fetch(request);
   },
 };
-
-// DO を export
-export { CounterDO } from "./do-worker/do-worker";
