@@ -10,5 +10,5 @@ name = "CounterDO"
 class_name = "CounterDO"
 
 [[migrations]]
-tag = "v12"
-new_sqlite_classes = ["CounterDO"]
+tag = "v13"
+#new_sqlite_classes = ["CounterDO"]
