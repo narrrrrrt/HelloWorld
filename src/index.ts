@@ -18,4 +18,5 @@ export default {
   },
 };
 
+// Ensure DO is exported from entrypoint
 export { CounterDO } from "./do-worker/do-worker";

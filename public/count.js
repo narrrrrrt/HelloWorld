@@ -1,7 +1,6 @@
 const counterEl = document.getElementById("count");
-const evtSource = new EventSource("/events");
-
-evtSource.onmessage = function(event) {
-  const data = JSON.parse(event.data);
+const es = new EventSource("/events");
+es.onmessage = (ev) => {
+  const data = JSON.parse(ev.data);
   counterEl.textContent = data.count;
 };

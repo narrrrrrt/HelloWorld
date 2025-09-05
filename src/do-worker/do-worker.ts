@@ -12,7 +12,6 @@ export class CounterDO {
   async fetch(request: Request) {
     const url = new URL(request.url);
 
-    // カウントアップ処理
     if (url.pathname.endsWith("/countup") && request.method === "POST") {
       let count = (await this.storage.get("count")) || 0;
       count++;
@@ -23,17 +22,15 @@ export class CounterDO {
       });
     }
 
-    // SSE (イベントストリーム)
     if (url.pathname.endsWith("/events")) {
       const { readable, writable } = new TransformStream();
       const writer = writable.getWriter();
       this.listeners.add(writer);
 
-      // 初期値を必ず送る
+      // send initial value and await to flush
       let count = (await this.storage.get("count")) || 0;
       await writer.write(`data: ${JSON.stringify({ count })}\n\n`);
 
-      // 切断時にクリーンアップ
       request.signal.addEventListener("abort", () => {
         this.listeners.delete(writer);
         writer.close();
