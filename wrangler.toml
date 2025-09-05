@@ -5,6 +5,10 @@ compatibility_date = "2025-09-05"
 [assets]
 directory = "./public"
 
+[[durable_objects.bindings]]
+name = "CounterDO2"
+class_name = "CounterDO2"
+
 [[migrations]]
-tag = "remove-do"
-delete_classes = ["CounterDO"]
+tag = "v22"
+new_sqlite_classes = ["CounterDO2"]

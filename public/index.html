@@ -6,11 +6,20 @@
 </head>
 <body>
   <h1>Counter + SSE</h1>
+  <p>カウンター: <span id="count">0</span></p>
   <p>現在時刻 (SSE): <span id="time">...</span></p>
+  <button id="btn">Count Up</button>
 
   <script>
-    const evtSource = new EventSource("/events");
-    evtSource.onmessage = (e) => {
+    async function updateCount() {
+      const res = await fetch("/countup", { method: "POST" });
+      const data = await res.json();
+      document.getElementById("count").textContent = data.count;
+    }
+    document.getElementById("btn").onclick = updateCount;
+
+    const evt = new EventSource("/events");
+    evt.onmessage = e => {
       document.getElementById("time").textContent = e.data;
     };
   </script>
