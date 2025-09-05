@@ -1,6 +1,7 @@
-async function updateCounter() {
-  const res = await fetch("/count");
-  const data = await res.json();
-  document.getElementById("count").textContent = data.count;
-}
-updateCounter();
+const counterEl = document.getElementById("count");
+const evtSource = new EventSource("/events");
+
+evtSource.onmessage = function(event) {
+  const data = JSON.parse(event.data);
+  counterEl.textContent = data.count;
+};
