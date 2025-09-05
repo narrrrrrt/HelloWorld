@@ -2,25 +2,19 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>Counter + SSE</title>
+  <title>SSE Timestamp</title>
 </head>
 <body>
-  <h1>Counter + SSE</h1>
-  <p>カウンター: <span id="count">0</span></p>
-  <p>現在時刻 (SSE): <span id="time">...</span></p>
-  <button id="btn">Count Up</button>
+  <h1>SSE Timestamp Demo</h1>
+  <p>現在時刻 (SSE): <span id="time">接続中...</span></p>
 
   <script>
-    async function updateCount() {
-      const res = await fetch("/countup", { method: "POST" });
-      const data = await res.json();
-      document.getElementById("count").textContent = data.count;
-    }
-    document.getElementById("btn").onclick = updateCount;
-
-    const evt = new EventSource("/events");
-    evt.onmessage = e => {
-      document.getElementById("time").textContent = e.data;
+    const evtSource = new EventSource("/events");
+    evtSource.onmessage = (event) => {
+      document.getElementById("time").textContent = event.data;
+    };
+    evtSource.onerror = (err) => {
+      console.error("SSE error:", err);
     };
   </script>
 </body>

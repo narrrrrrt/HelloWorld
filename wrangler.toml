@@ -1,11 +1,7 @@
-name = "counter-sse-time"
+name = "sse-timestamp"
 main = "src/index.ts"
-compatibility_date = "2025-09-05"
+compatibility_date = "2025-09-06"
 
 [assets]
 directory = "./public"
-
-# DO を削除する migration
-[[migrations]]
-tag = "v30"                      # 新しい番号にすること！
-deleted_classes = ["CounterDO"]  # 古い DO を完全に掃除
+binding = "ASSETS"

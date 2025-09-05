@@ -1,72 +1,31 @@
-export class CounterDO2 {
-  state: DurableObjectState;
-  count: number;
-
-  constructor(state: DurableObjectState) {
-    this.state = state;
-    this.count = 0;
-  }
-
-  async fetch(request: Request): Promise<Response> {
-    const url = new URL(request.url);
-
-    if (url.pathname === "/increment") {
-      this.count++;
-      return new Response(JSON.stringify({ count: this.count }), {
-        headers: { "Content-Type": "application/json" }
-      });
-    }
-
-    if (url.pathname === "/value") {
-      return new Response(JSON.stringify({ count: this.count }), {
-        headers: { "Content-Type": "application/json" }
-      });
-    }
-
-    return new Response("Not found", { status: 404 });
-  }
-}
-
 export default {
   async fetch(req: Request, env: any): Promise<Response> {
     const url = new URL(req.url);
 
-    if (url.pathname === "/countup") {
-      const id = env.CounterDO2.idFromName("A");
-      const obj = env.CounterDO2.get(id);
-      return obj.fetch(new Request("http://dummy/increment"));
-    }
-
     if (url.pathname === "/events") {
       const stream = new ReadableStream({
         start(controller) {
-          function send() {
-            controller.enqueue(
-              new TextEncoder().encode(`data: ${new Date().toISOString()}
-
-`)
-            );
-            setTimeout(send, 1000);
+          const encoder = new TextEncoder();
+          function push() {
+            const now = new Date().toISOString();
+            controller.enqueue(encoder.encode(`data: ${now}\n\n`));
           }
-          send();
-        }
+          push();
+          const interval = setInterval(push, 1000);
+          (controller as any).close = () => clearInterval(interval);
+        },
       });
 
       return new Response(stream, {
         headers: {
           "Content-Type": "text/event-stream",
           "Cache-Control": "no-cache",
-          "Connection": "keep-alive"
-        }
+          "Connection": "keep-alive",
+        },
       });
     }
 
-    if (url.pathname === "/value") {
-      const id = env.CounterDO2.idFromName("A");
-      const obj = env.CounterDO2.get(id);
-      return obj.fetch(new Request("http://dummy/value"));
-    }
-
-    return new Response("Not found", { status: 404 });
-  }
+    // デフォルトは public/ のアセットを返す
+    return env.ASSETS.fetch(req);
+  },
 };
