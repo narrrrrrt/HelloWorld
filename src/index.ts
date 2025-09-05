@@ -8,18 +8,6 @@ export default {
       return stub.fetch("/countup", { method: "POST" });
     }
 
-    if (url.pathname === "/events") {
-      const id = env.CounterDO.idFromName("global");
-      const stub = env.CounterDO.get(id);
-      return stub.fetch("/events");
-    }
-
-    if (url.pathname === "/access") {
-      const id = env.CounterDO.idFromName("global");
-      const stub = env.CounterDO.get(id);
-      return stub.fetch("/access");
-    }
-
     return env.ASSETS.fetch(request);
   },
 };
