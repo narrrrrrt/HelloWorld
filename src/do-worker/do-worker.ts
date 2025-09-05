@@ -1,7 +1,7 @@
 export class CounterDO {
   state: DurableObjectState;
   storage: DurableObjectStorage;
-  listeners: Set<any>;
+  listeners: Set<WritableStreamDefaultWriter>;
 
   constructor(state: DurableObjectState, env: any) {
     this.state = state;
@@ -12,6 +12,7 @@ export class CounterDO {
   async fetch(request: Request) {
     const url = new URL(request.url);
 
+    // カウントアップ処理
     if (url.pathname.endsWith("/countup") && request.method === "POST") {
       let count = (await this.storage.get("count")) || 0;
       count++;
@@ -22,15 +23,17 @@ export class CounterDO {
       });
     }
 
+    // SSE (イベントストリーム)
     if (url.pathname.endsWith("/events")) {
       const { readable, writable } = new TransformStream();
       const writer = writable.getWriter();
       this.listeners.add(writer);
 
-      // 初期値送信
+      // 初期値を必ず送る
       let count = (await this.storage.get("count")) || 0;
       writer.write(`data: ${JSON.stringify({ count })}\n\n`);
 
+      // 切断時にクリーンアップ
       request.signal.addEventListener("abort", () => {
         this.listeners.delete(writer);
         writer.close();
