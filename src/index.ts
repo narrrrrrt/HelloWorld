@@ -69,4 +69,4 @@ export default {
 };
 
 
-export { CounterDO } from "./CounterDO";
+export { CounterDO } from "./CounterDO.ts";
