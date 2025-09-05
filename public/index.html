@@ -2,14 +2,15 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>SSE Only</title>
+  <title>Counter + SSE</title>
 </head>
 <body>
-  <h1>SSE Only</h1>
-  <div id="time">...</div>
+  <h1>Counter + SSE</h1>
+  <p>現在時刻 (SSE): <span id="time">...</span></p>
+
   <script>
-    const eventSource = new EventSource("/events");
-    eventSource.onmessage = (e) => {
+    const evtSource = new EventSource("/events");
+    evtSource.onmessage = (e) => {
       document.getElementById("time").textContent = e.data;
     };
   </script>

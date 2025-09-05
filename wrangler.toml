@@ -6,5 +6,5 @@ compatibility_date = "2025-09-05"
 directory = "./public"
 
 [[migrations]]
-tag = "v20"
-delete_class = "CounterDO"
+tag = "remove-do"
+delete_classes = ["CounterDO"]
