@@ -1,18 +1,18 @@
 export default {
-  async fetch(req: Request, env: any): Promise<Response> {
-    const url = new URL(req.url);
+  async fetch(request: Request, env: any): Promise<Response> {
+    const url = new URL(request.url);
 
     if (url.pathname === "/events") {
       const stream = new ReadableStream({
         start(controller) {
           const encoder = new TextEncoder();
-          function push() {
-            const now = new Date().toISOString();
-            controller.enqueue(encoder.encode(`data: ${now}\n\n`));
-          }
-          push();
-          const interval = setInterval(push, 1000);
-          (controller as any).close = () => clearInterval(interval);
+
+          const interval = setInterval(() => {
+            const data = `data: ${new Date().toISOString()}\n\n`;
+            controller.enqueue(encoder.encode(data));
+          }, 1000);
+
+          controller.close = () => clearInterval(interval);
         },
       });
 
@@ -25,7 +25,6 @@ export default {
       });
     }
 
-    // デフォルトは public/ のアセットを返す
-    return env.ASSETS.fetch(req);
+    return env.ASSETS.fetch(request);
   },
 };
