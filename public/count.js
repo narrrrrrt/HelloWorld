@@ -1,5 +1,6 @@
-fetch("/countup", { method: "POST" })
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById("count").textContent = data.count;
-  });
+async function updateCounter() {
+  const res = await fetch("/count");
+  const data = await res.json();
+  document.getElementById("count").textContent = data.count;
+}
+updateCounter();
