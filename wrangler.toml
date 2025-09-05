@@ -12,10 +12,10 @@ class_name = "CounterDO"
 
 # --- Durable Object migrations ---
 
-[[migrations]]
-tag = "v1"
+#[[migrations]]
+#tag = "v1"
 # 初回作成時はこちらを有効にする
 # new_sqlite_classes = ["CounterDO"]
 
 # 既に作成済みの DO を再利用するときはこちらを使う
-classes = ["CounterDO"]
+#classes = ["CounterDO"]
