@@ -1,4 +1,4 @@
-name = "hello-counter-do"
+name = "counter-sse-time"
 main = "src/index.ts"
 compatibility_date = "2025-09-05"
 
