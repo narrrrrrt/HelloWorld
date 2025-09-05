@@ -4,17 +4,18 @@ compatibility_date = "2025-09-05"
 
 [assets]
 directory = "./public"
+binding = "ASSETS"
 
 [[durable_objects.bindings]]
 name = "CounterDO"
 class_name = "CounterDO"
 
-# まず古い DO を削除
-[[migrations]]
-tag = "v-clean"
-delete_class = "CounterDO"
+# --- Durable Object migrations ---
 
-# 新規作成
 [[migrations]]
 tag = "v1"
-new_sqlite_classes = ["CounterDO"]
+# 初回作成時はこちらを有効にする
+# new_sqlite_classes = ["CounterDO"]
+
+# 既に作成済みの DO を再利用するときはこちらを使う
+classes = ["CounterDO"]
