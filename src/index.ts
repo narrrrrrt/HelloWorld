@@ -1,23 +1,19 @@
 export default {
-  async fetch(request: Request, env: any, ctx: ExecutionContext) {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
-    if (url.pathname === "/countup") {
-      const id = env.CounterDO.idFromName("global");
-      const stub = env.CounterDO.get(id);
-      return stub.fetch("https://do/countup", { method: "POST" });
-    }
-
+    // 1. SSE のイベントストリーム
     if (url.pathname === "/events") {
       const { readable, writable } = new TransformStream();
       const writer = writable.getWriter();
 
-      const send = (msg: any) => writer.write(`data: ${JSON.stringify(msg)}\n\n`);
+      function send(msg: any) {
+        writer.write(`data: ${JSON.stringify(msg)}\n\n`);
+      }
 
-      // 初期送信
+      // 初回送信
       send({ time: new Date().toISOString() });
 
-      // 5秒ごとに時刻を送信
       const interval = setInterval(() => {
         send({ time: new Date().toISOString() });
       }, 5000);
@@ -36,8 +32,17 @@ export default {
       });
     }
 
+    // 2. カウンターアップ → DO に投げる
+    if (url.pathname === "/countup") {
+      const id = env.CounterDO.idFromName("global");
+      const stub = env.CounterDO.get(id);
+      return stub.fetch("https://do/countup", { method: "POST" });
+    }
+
+    // 3. それ以外は静的アセットへ
     return env.ASSETS.fetch(request);
   },
 };
 
+// DO を export
 export { CounterDO } from "./do-worker/do-worker";
