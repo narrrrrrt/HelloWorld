@@ -1,4 +1,4 @@
-name = "hello-counter-sse-v2"
+name = "hello-counter-sse-access"
 main = "src/index.ts"
 compatibility_date = "2025-09-05"
 
@@ -10,5 +10,5 @@ name = "CounterDO"
 class_name = "CounterDO"
 
 [[migrations]]
-tag = "v2"
+tag = "v1"
 new_sqlite_classes = ["CounterDO"]

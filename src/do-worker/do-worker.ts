@@ -12,23 +12,22 @@ export class CounterDO {
   async fetch(request: Request) {
     const url = new URL(request.url);
 
-    if (url.pathname.endsWith("/countup") && request.method === "POST") {
-      let count = (await this.storage.get("count")) || 0;
+    if (url.pathname === "/countup" && request.method === "POST") {
+      let count = (await this.storage.get("sseCount")) || 0;
       count++;
-      await this.storage.put("count", count);
+      await this.storage.put("sseCount", count);
       this.broadcast(count);
       return new Response(JSON.stringify({ count }), {
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    if (url.pathname.endsWith("/events")) {
+    if (url.pathname === "/events") {
       const { readable, writable } = new TransformStream();
       const writer = writable.getWriter();
       this.listeners.add(writer);
 
-      // send initial value and await to flush
-      let count = (await this.storage.get("count")) || 0;
+      let count = (await this.storage.get("sseCount")) || 0;
       await writer.write(`data: ${JSON.stringify({ count })}\n\n`);
 
       request.signal.addEventListener("abort", () => {
@@ -42,6 +41,15 @@ export class CounterDO {
           "Cache-Control": "no-cache, no-transform",
           "Connection": "keep-alive",
         },
+      });
+    }
+
+    if (url.pathname === "/access") {
+      let count = (await this.storage.get("accessCount")) || 0;
+      count++;
+      await this.storage.put("accessCount", count);
+      return new Response(JSON.stringify({ count }), {
+        headers: { "Content-Type": "application/json" },
       });
     }
 
