@@ -18,4 +18,4 @@ tag = "v1"
 # new_sqlite_classes = ["CounterDO"]
 
 # 既に作成済みの DO を再利用するときはこちらを使う
-new_classes = ["CounterDO"] = ["CounterDO"]
+new_classes = ["CounterDO"]
