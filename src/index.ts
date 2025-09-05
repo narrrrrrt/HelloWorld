@@ -11,3 +11,6 @@ export default {
     return env.ASSETS.fetch(request);
   },
 };
+
+// Durable Object を export
+export { CounterDO } from "./do-worker/do-worker";

@@ -1,4 +1,4 @@
-name = "ive"
+name = "hello-counter-do"
 main = "src/index.ts"
 compatibility_date = "2025-09-05"
 
