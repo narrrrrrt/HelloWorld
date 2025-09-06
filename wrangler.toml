@@ -15,7 +15,7 @@ class_name = "CounterDO"
 [[migrations]]
 tag = "v1"
 # 初回作成時はこちらを有効にする
-# new_sqlite_classes = ["CounterDO"]
+new_sqlite_classes = ["CounterDO"]
 
 # 既に作成済みの DO を再利用するときはこちらを使う
-new_classes = ["CounterDO"]
+#new_classes = ["CounterDO"]
